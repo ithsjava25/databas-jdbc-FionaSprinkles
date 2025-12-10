@@ -1,13 +1,13 @@
 package com.example;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import javax.management.Query;
+import java.sql.*;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class Main {
 
-    static void main(String[] args) {
+    public static void main(String[] args) {
         if (isDevMode(args)) {
             DevDatabaseInitializer.start();
         }
@@ -27,10 +27,43 @@ public class Main {
         }
 
         try (Connection connection = DriverManager.getConnection(jdbcUrl, dbUser, dbPass)) {
+            Scanner sc = new Scanner(System.in);
+            login(sc, connection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         //Todo: Starting point for your code
+
+
+    }
+
+    private static void login(Scanner sc , Connection connection) {
+        while (true) {
+            System.out.println("Enter username:");
+            String username = sc.nextLine();
+            System.out.println("Enter password:");
+            String password = sc.nextLine();
+
+
+            String query = "SELECT user_id FROM account WHERE name = ? AND password = ?";
+            try (PreparedStatement statement = connection.prepareStatement(query)){
+                statement.setString(1, username);
+                statement.setString(2, password);
+
+                ResultSet rs = statement.executeQuery();
+
+                if (rs.next()) {
+                    System.out.println("You logged in as " + username);
+                    break;
+                } else  {
+                    System.out.println("Invalid username or password");
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+
+        }
     }
 
     /**
