@@ -37,7 +37,6 @@ public class Main {
         //Todo: Starting point for your code
 
 
-
     }
 
     //Main Menu
@@ -71,7 +70,11 @@ public class Main {
                     }
                     break;
                 case 2:
-                    System.out.println("Get a moon mission by mission_id");
+                    try {
+                        missionID(sc, connection);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
                     break;
                 case 3:
                     System.out.println("Count missions for a given year");
@@ -104,6 +107,31 @@ public class Main {
         while (moonMission.next()){
             String spacecraft = moonMission.getString("spacecraft");
             System.out.println(spacecraft);
+        }
+    }
+
+    //Menu Option 2 : Get a moon mission by mission_id
+    private static void missionID(Scanner sc, Connection connection) throws SQLException {
+        System.out.println("Mission id:");
+        int missionID = Integer.parseInt(sc.nextLine());
+
+        String query = "select * from moon_mission WHERE mission_id = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setInt(1, missionID);
+        ResultSet missionIdResult = statement.executeQuery();
+
+        if (missionIdResult.next()) {
+            String mission = missionIdResult.getString("mission_type");
+            String spacecraft = missionIdResult.getString("spacecraft");
+            String launchDate = missionIdResult.getString("launch_date");
+            String outcome = missionIdResult.getString("outcome");
+
+            System.out.println("Mission type: " + mission);
+            System.out.println("Launch date: " + launchDate);
+            System.out.println("Outcome: " + outcome);
+            System.out.println("Spacecraft: " + spacecraft);
+        } else  {
+            System.out.println("No mission found");
         }
     }
 
