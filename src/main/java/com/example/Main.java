@@ -40,6 +40,7 @@ public class Main {
 
     }
 
+    //Main Menu
     private void menu(Scanner sc, Connection connection) {
         while (true) {
 
@@ -62,8 +63,12 @@ public class Main {
                 }
 
             switch (choice) {
-                case 1:
-                    System.out.println("List moon missions");
+                case 1: // List moon missions
+                    try {
+                        moonMission(connection);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
                     break;
                 case 2:
                     System.out.println("Get a moon mission by mission_id");
@@ -91,6 +96,18 @@ public class Main {
         }
     }
 
+    // Menu Option 1 : List Moon Missions
+    private void moonMission(Connection connection) throws SQLException {
+        String query = "SELECT spacecraft FROM moon_mission";
+        PreparedStatement statement = connection.prepareStatement(query);
+        ResultSet moonMission = statement.executeQuery();
+        while (moonMission.next()){
+            String spacecraft = moonMission.getString("spacecraft");
+            System.out.println(spacecraft);
+        }
+    }
+
+    //LogIn with username and password
     private static void login(Scanner sc , Connection connection) {
         while (true) {
             System.out.println("Enter username:");
