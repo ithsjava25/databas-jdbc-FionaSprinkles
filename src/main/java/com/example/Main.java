@@ -69,15 +69,19 @@ public class Main {
                         throw new RuntimeException(e);
                     }
                     break;
-                case 2:
+                case 2: // Get a moon mission by mission_id
                     try {
                         missionID(sc, connection);
                     } catch (SQLException e) {
                         throw new RuntimeException(e);
                     }
                     break;
-                case 3:
-                    System.out.println("Count missions for a given year");
+                case 3: // Count missions for a given year
+                    try {
+                        countYears(sc, connection);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
                     break;
                 case 4:
                     System.out.println("Create an account");
@@ -133,6 +137,23 @@ public class Main {
         } else  {
             System.out.println("No mission found");
         }
+    }
+
+    //Menu Option 3 : Count missions for a given year
+    private static void countYears(Scanner sc, Connection connection) throws SQLException {
+        System.out.println("What year would you like to see?");
+        System.out.println("Write year YYYY");
+
+        int year = Integer.parseInt(sc.nextLine());
+
+        String query = "SELECT count(*) FROM moon_mission WHERE YEAR(launch_date) = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setInt(1, year);
+
+        ResultSet countMissions = preparedStatement.executeQuery();
+        countMissions.next();
+        int totalYears = countMissions.getInt(1);
+        System.out.println("In " + year + " there were " +  totalYears + " mission/missions.");
     }
 
     //LogIn with username and password
