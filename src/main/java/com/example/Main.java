@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 public class Main {
 
+
     public static void main(String[] args) {
         if (isDevMode(args)) {
             DevDatabaseInitializer.start();
@@ -29,12 +30,65 @@ public class Main {
         try (Connection connection = DriverManager.getConnection(jdbcUrl, dbUser, dbPass)) {
             Scanner sc = new Scanner(System.in);
             login(sc, connection);
+            menu(sc, connection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         //Todo: Starting point for your code
 
 
+
+    }
+
+    private void menu(Scanner sc, Connection connection) {
+        while (true) {
+
+            System.out.println("1) List moon missions");
+            System.out.println("2) Get a moon mission by mission_id");
+            System.out.println("3) Count missions for a given year");
+            System.out.println("4) Create an account");
+            System.out.println("5) Update an account password");
+            System.out.println("6) Delete an account");
+            System.out.println("0) Exit");
+
+            int choice;
+
+            try {
+                choice = Integer.parseInt(sc.nextLine());
+
+            } catch (Exception e) {
+                    System.out.println("Invalid choice.");
+                    continue;
+                }
+
+            switch (choice) {
+                case 1:
+                    System.out.println("List moon missions");
+                    break;
+                case 2:
+                    System.out.println("Get a moon mission by mission_id");
+                    break;
+                case 3:
+                    System.out.println("Count missions for a given year");
+                    break;
+                case 4:
+                    System.out.println("Create an account");
+                    break;
+                case 5:
+                    System.out.println("Update an account password");
+                    break;
+                case 6:
+                    System.out.println("Delete an account");
+                    break;
+                case 0:
+                    System.out.println("Exit");
+                    return;
+
+                    default:
+                        System.out.println("Invalid choice.");
+            }
+
+        }
     }
 
     private static void login(Scanner sc , Connection connection) {
