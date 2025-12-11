@@ -99,8 +99,12 @@ public class Main {
                         throw new RuntimeException(e);
                     }
                     break;
-                case 6:
-                    System.out.println("Delete an account");
+                case 6: // Delete an account
+                    try {
+                        deleteAccount(sc, connection);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
                     break;
                 case 0:
                     System.out.println("Exit");
@@ -212,6 +216,19 @@ public class Main {
         System.out.println("Your password has been updated");
         System.out.println("updated");
 
+    }
+
+    // Menu Option 6 : Delete an account
+    private static void deleteAccount(Scanner sc, Connection connection) throws SQLException {
+        System.out.println("To delete user, enter userID:");
+        int userID = Integer.parseInt(sc.nextLine());
+
+        String query = "DELETE FROM account WHERE user_id = ?";
+        PreparedStatement delete = connection.prepareStatement(query);
+        delete.setInt(1, userID);
+        delete.executeUpdate();
+
+        System.out.println("Account deleted successfully");
     }
 
     //LogIn with username and password
