@@ -1,5 +1,7 @@
 package com.example;
 
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.util.ISO8601Utils;
+
 import javax.management.Query;
 import java.sql.*;
 import java.util.Arrays;
@@ -38,8 +40,6 @@ public class Main {
 
 
     }
-
-    // Menu Option 4 : Create an account
 
     //Main Menu
     private void menu(Scanner sc, Connection connection) {
@@ -92,8 +92,12 @@ public class Main {
                         throw new RuntimeException(e);
                     }
                     break;
-                case 5:
-                    System.out.println("Update an account password");
+                case 5: // Update an account password
+                    try {
+                        updatePassword(sc, connection);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
                     break;
                 case 6:
                     System.out.println("Delete an account");
@@ -189,6 +193,24 @@ public class Main {
 
         System.out.println("Account created successfully");
         System.out.println("Your username: " + name);
+
+    }
+
+    // Menu Option 5 : Update an account password
+    private static void updatePassword(Scanner sc, Connection connection) throws SQLException {
+
+        System.out.println("Please enter your userID:");
+        int userID = Integer.parseInt(sc.nextLine());
+        System.out.println("Please enter your new password:");
+        String newPassword = sc.nextLine();
+        String query2 = "UPDATE account SET password=? WHERE user_id=?";
+        PreparedStatement update = connection.prepareStatement(query2);
+        update.setString(1, newPassword);
+        update.setInt(2, userID);
+        update.executeUpdate();
+
+        System.out.println("Your password has been updated");
+        System.out.println("updated");
 
     }
 
