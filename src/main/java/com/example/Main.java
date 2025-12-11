@@ -39,6 +39,8 @@ public class Main {
 
     }
 
+    // Menu Option 4 : Create an account
+
     //Main Menu
     private void menu(Scanner sc, Connection connection) {
         while (true) {
@@ -83,8 +85,12 @@ public class Main {
                         throw new RuntimeException(e);
                     }
                     break;
-                case 4:
-                    System.out.println("Create an account");
+                case 4: //Create an account
+                    try {
+                        createNewAccount(sc, connection);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
                     break;
                 case 5:
                     System.out.println("Update an account password");
@@ -154,6 +160,36 @@ public class Main {
         countMissions.next();
         int totalYears = countMissions.getInt(1);
         System.out.println("In " + year + " there were " +  totalYears + " mission/missions.");
+    }
+
+    // Menu Option 4 : Create an account
+    private static void createNewAccount(Scanner sc, Connection connection) throws SQLException {
+        System.out.println("Create new account");
+
+        System.out.println("Please enter new password:");
+        String password = sc.nextLine();
+        System.out.println("Please enter your first name:");
+        String firstName = sc.nextLine();
+        System.out.println("Please enter your last name:");
+        String lastName = sc.nextLine();
+        System.out.println("Please enter your ssn:");
+        String ssn = sc.nextLine();
+
+        //Generate username
+        String name = firstName.substring(0, 3) + lastName.substring(0, 3);
+
+        String query = "INSERT INTO account (password, first_name, last_name, ssn, name) VALUES (?, ?, ?, ?, ?)";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, password);
+        preparedStatement.setString(2, firstName);
+        preparedStatement.setString(3, lastName);
+        preparedStatement.setString(4, ssn);
+        preparedStatement.setString(5, name);
+        preparedStatement.executeUpdate();
+
+        System.out.println("Account created successfully");
+        System.out.println("Your username: " + name);
+
     }
 
     //LogIn with username and password
