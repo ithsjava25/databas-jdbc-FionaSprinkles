@@ -63,59 +63,47 @@ public class Main {
                 continue;
             }
 
-            switch (choice) {
-                case 1: // List moon missions
-                    try {
-                        moonMission(connection);
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    }
-                    break;
-                case 2: // Get a moon mission by mission_id
-                    try {
-                        missionID(sc, connection);
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    }
-                    break;
-                case 3: // Count missions for a given year
-                    try {
-                        countYears(sc, connection);
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    }
-                    break;
-                case 4: //Create an account
-                    try {
-                        createNewAccount(sc, connection);
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    }
-                    break;
-                case 5: // Update an account password
-                    try {
-                        updatePassword(sc, connection);
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    }
-                    break;
-                case 6: // Delete an account
-                    try {
-                        deleteAccount(sc, connection);
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    }
-                    break;
-                case 0:
-                    System.out.println("Exit");
-                    return;
+            try {
+                switch (choice) {
+                    case 1: // List moon missions
+                            moonMission(connection);
 
-                default:
-                    System.out.println("Invalid choice.");
+                        break;
+                    case 2: // Get a moon mission by mission_id
+                            missionID(sc, connection);
+
+                        break;
+                    case 3: // Count missions for a given year
+                            countYears(sc, connection);
+
+                        break;
+                    case 4: //Create an account
+                            createNewAccount(sc, connection);
+
+                        break;
+                    case 5: // Update an account password
+                            updatePassword(sc, connection);
+
+                        break;
+                    case 6: // Delete an account
+                            deleteAccount(sc, connection);
+
+                        break;
+                    case 0:
+                        System.out.println("Exit");
+                        return;
+
+                    default:
+                        System.out.println("Invalid choice.");
+                        }
+                } catch(SQLException e)
+                {
+                    System.out.println("Database error: " + e.getMessage());
+                }
             }
 
         }
-    }
+
 
     // Menu Option 1 : List Moon Missions
     private void moonMission(Connection connection) throws SQLException {
