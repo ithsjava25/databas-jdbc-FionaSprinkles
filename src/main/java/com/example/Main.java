@@ -1,13 +1,16 @@
 package com.example;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.util.ISO8601Utils;
+
+import javax.management.Query;
+import java.sql.*;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class Main {
 
-    static void main(String[] args) {
+
+    public static void main(String[] args) {
         if (isDevMode(args)) {
             DevDatabaseInitializer.start();
         }
@@ -26,13 +29,258 @@ public class Main {
                             "as system properties (-Dkey=value) or environment variables.");
         }
 
-        try (Connection connection = DriverManager.getConnection(jdbcUrl, dbUser, dbPass)) {
+        try (Connection connection = DriverManager.getConnection(jdbcUrl, dbUser, dbPass);
+            Scanner sc = new Scanner(System.in)){
+            login(sc, connection);
+            menu(sc, connection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         //Todo: Starting point for your code
+
+
     }
 
+    // Main Menu
+    private void menu(Scanner sc, Connection connection) {
+        while (true) {
+
+            System.out.println("1) List moon missions");
+            System.out.println("2) Get a moon mission by mission_id");
+            System.out.println("3) Count missions for a given year");
+            System.out.println("4) Create an account");
+            System.out.println("5) Update an account password");
+            System.out.println("6) Delete an account");
+            System.out.println("0) Exit");
+
+            int choice;
+
+            try {
+                choice = Integer.parseInt(sc.nextLine());
+
+            } catch (Exception e) {
+                System.out.println("Invalid choice.");
+                continue;
+            }
+
+            try {
+                switch (choice) {
+                    case 1: // List moon missions
+                            moonMission(connection);
+
+                        break;
+                    case 2: // Get a moon mission by mission_id
+                            missionID(sc, connection);
+
+                        break;
+                    case 3: // Count missions for a given year
+                            countYears(sc, connection);
+
+                        break;
+                    case 4: //Create an account
+                            createNewAccount(sc, connection);
+
+                        break;
+                    case 5: // Update an account password
+                            updatePassword(sc, connection);
+
+                        break;
+                    case 6: // Delete an account
+                            deleteAccount(sc, connection);
+
+                        break;
+                    case 0:
+                        System.out.println("Exit");
+                        return;
+
+                    default:
+                        System.out.println("Invalid choice.");
+                        }
+                } catch(SQLException e)
+                {
+                    System.out.println("Database error: " + e.getMessage());
+                }
+            }
+
+        }
+
+    // Menu Option 1 : List Moon Missions
+    private void moonMission(Connection connection) throws SQLException {
+        String query = "SELECT spacecraft FROM moon_mission";
+        try (PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet moonMission = statement.executeQuery()) {
+            while (moonMission.next()) {
+                String spacecraft = moonMission.getString("spacecraft");
+                System.out.println(spacecraft);
+            }
+        }
+    }
+
+    //Menu Option 2 : Get a moon mission by mission_id
+    private static void missionID(Scanner sc, Connection connection) throws SQLException {
+        Integer missionID = readInt(sc, "Mission id:");
+        if (missionID == null) {
+            return;
+        }
+
+        String query = "select * from moon_mission WHERE mission_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, missionID);
+
+            try (ResultSet missionIdResult = statement.executeQuery()) {
+
+                if (missionIdResult.next()) {
+                    String mission = missionIdResult.getString("mission_type");
+                    String spacecraft = missionIdResult.getString("spacecraft");
+                    String launchDate = missionIdResult.getString("launch_date");
+                    String outcome = missionIdResult.getString("outcome");
+
+                    System.out.println("Mission type: " + mission);
+                    System.out.println("Launch date: " + launchDate);
+                    System.out.println("Outcome: " + outcome);
+                    System.out.println("Spacecraft: " + spacecraft);
+                } else {
+                    System.out.println("No mission found");
+                }
+            }
+        }
+    }
+
+    //Menu Option 3 : Count missions for a given year
+    private static void countYears(Scanner sc, Connection connection) throws SQLException {
+        Integer year = readInt(sc, "What year would you like to see? : \n Write year YYYY");
+        if (year == null) {
+            return;
+        }
+
+        String query = "SELECT count(*) FROM moon_mission WHERE YEAR(launch_date) = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, year);
+
+            try (ResultSet countMissions = preparedStatement.executeQuery()) {
+                countMissions.next();
+                int totalYears = countMissions.getInt(1);
+                System.out.println("In " + year + " there were " + totalYears + " mission/missions.");
+            }
+        }
+
+    }
+
+    // Menu Option 4 : Create an account
+    private static void createNewAccount(Scanner sc, Connection connection) throws SQLException {
+        System.out.println("Create new account");
+
+        System.out.println("Please enter new password:");
+        String password = sc.nextLine();
+        System.out.println("Please enter your first name:");
+        String firstName = sc.nextLine();
+        System.out.println("Please enter your last name:");
+        String lastName = sc.nextLine();
+        System.out.println("Please enter your ssn:");
+        String ssn = sc.nextLine();
+
+        //Generate username
+
+        String name1 = firstName.length() < 3 ? firstName : firstName.substring(0, 3);
+        String name2 = lastName.length() < 3 ? lastName : lastName.substring(0, 3);
+        String name = name1 + name2;
+
+        String query = "INSERT INTO account (password, first_name, last_name, ssn, name) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)){
+        preparedStatement.setString(1, password);
+        preparedStatement.setString(2, firstName);
+        preparedStatement.setString(3, lastName);
+        preparedStatement.setString(4, ssn);
+        preparedStatement.setString(5, name);
+        preparedStatement.executeUpdate();
+
+            System.out.println("Account created successfully");
+            System.out.println("Your username: " + name);
+        }
+
+    }
+
+    // Menu Option 5 : Update an account password
+    private static void updatePassword(Scanner sc, Connection connection) throws SQLException {
+
+        Integer userID =  readInt(sc, "Please enter your userID:");
+        if (userID == null) {
+            return;
+        }
+        System.out.println("Please enter your new password:");
+        String newPassword = sc.nextLine();
+        String query2 = "UPDATE account SET password=? WHERE user_id=?";
+        try (PreparedStatement update = connection.prepareStatement(query2)){
+        update.setString(1, newPassword);
+        update.setInt(2, userID);
+        update.executeUpdate();
+
+            System.out.println("Your password has been updated");
+            System.out.println("updated");
+        }
+
+    }
+
+    // Menu Option 6 : Delete an account
+    private static void deleteAccount(Scanner sc, Connection connection) throws SQLException {
+        Integer userID = readInt(sc, "To delete user, please enter userID:");
+        if (userID == null) {
+            return;
+        }
+
+        String query = "DELETE FROM account WHERE user_id = ?";
+        try (PreparedStatement delete = connection.prepareStatement(query)) {
+            delete.setInt(1, userID);
+            delete.executeUpdate();
+
+            System.out.println("Account deleted successfully");
+        }
+    }
+
+    // LogIn with username and password
+    private static void login(Scanner sc , Connection connection) {
+        while (true) {
+            System.out.println("Enter username:");
+            String username = sc.nextLine();
+            System.out.println("Enter password:");
+            String password = sc.nextLine();
+
+
+            String query = "SELECT user_id FROM account WHERE name = ? AND password = ?";
+            try (PreparedStatement statement = connection.prepareStatement(query)){
+                statement.setString(1, username);
+                statement.setString(2, password);
+
+                try (ResultSet rs = statement.executeQuery()){
+
+                if (rs.next()) {
+                    System.out.println("You logged in as " + username);
+                    break;
+                } else {
+                    System.out.println("Invalid username or password");
+                }
+                }
+            } catch (SQLException e) {
+                    System.out.println("Database error: " + e.getMessage());
+
+            }
+
+
+        }
+    }
+
+    // Help method to validate numeric inputs
+    private static Integer readInt(Scanner sc, String prompt) {
+        System.out.println(prompt);
+        String s = sc.nextLine().trim();
+
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            System.out.println("Please enter a valid number.");
+            return null;
+        }
+    }
     /**
      * Determines if the application is running in development mode based on system properties,
      * environment variables, or command-line arguments.
