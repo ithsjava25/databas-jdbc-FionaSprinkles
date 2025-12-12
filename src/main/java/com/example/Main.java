@@ -41,7 +41,7 @@ public class Main {
 
     }
 
-    //Main Menu
+    // Main Menu
     private void menu(Scanner sc, Connection connection) {
         while (true) {
 
@@ -104,7 +104,6 @@ public class Main {
 
         }
 
-
     // Menu Option 1 : List Moon Missions
     private void moonMission(Connection connection) throws SQLException {
         String query = "SELECT spacecraft FROM moon_mission";
@@ -119,8 +118,10 @@ public class Main {
 
     //Menu Option 2 : Get a moon mission by mission_id
     private static void missionID(Scanner sc, Connection connection) throws SQLException {
-        System.out.println("Mission id:");
-        int missionID = Integer.parseInt(sc.nextLine());
+        Integer missionID = readInt(sc, "Mission id:");
+        if (missionID == null) {
+            return;
+        }
 
         String query = "select * from moon_mission WHERE mission_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -147,21 +148,21 @@ public class Main {
 
     //Menu Option 3 : Count missions for a given year
     private static void countYears(Scanner sc, Connection connection) throws SQLException {
-        System.out.println("What year would you like to see?");
-        System.out.println("Write year YYYY");
-
-        int year = Integer.parseInt(sc.nextLine());
+        Integer year = readInt(sc, "What year would you like to see? : \n Write year YYYY");
+        if (year == null) {
+            return;
+        }
 
         String query = "SELECT count(*) FROM moon_mission WHERE YEAR(launch_date) = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)){
-        preparedStatement.setInt(1, year);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, year);
 
-        try (ResultSet countMissions = preparedStatement.executeQuery()){
-        countMissions.next();
-        int totalYears = countMissions.getInt(1);
-        System.out.println("In " + year + " there were " + totalYears + " mission/missions.");
-    }
-    }
+            try (ResultSet countMissions = preparedStatement.executeQuery()) {
+                countMissions.next();
+                int totalYears = countMissions.getInt(1);
+                System.out.println("In " + year + " there were " + totalYears + " mission/missions.");
+            }
+        }
 
     }
 
@@ -199,8 +200,10 @@ public class Main {
     // Menu Option 5 : Update an account password
     private static void updatePassword(Scanner sc, Connection connection) throws SQLException {
 
-        System.out.println("Please enter your userID:");
-        int userID = Integer.parseInt(sc.nextLine());
+        Integer userID =  readInt(sc, "Please enter your userID:");
+        if (userID == null) {
+            return;
+        }
         System.out.println("Please enter your new password:");
         String newPassword = sc.nextLine();
         String query2 = "UPDATE account SET password=? WHERE user_id=?";
@@ -217,8 +220,10 @@ public class Main {
 
     // Menu Option 6 : Delete an account
     private static void deleteAccount(Scanner sc, Connection connection) throws SQLException {
-        System.out.println("To delete user, enter userID:");
-        int userID = Integer.parseInt(sc.nextLine());
+        Integer userID = readInt(sc, "To delete user, please enter userID:");
+        if (userID == null) {
+            return;
+        }
 
         String query = "DELETE FROM account WHERE user_id = ?";
         try (PreparedStatement delete = connection.prepareStatement(query)) {
@@ -229,7 +234,7 @@ public class Main {
         }
     }
 
-    //LogIn with username and password
+    // LogIn with username and password
     private static void login(Scanner sc , Connection connection) {
         while (true) {
             System.out.println("Enter username:");
@@ -259,6 +264,18 @@ public class Main {
         }
     }
 
+    // Help method to validate numeric inputs
+    private static Integer readInt(Scanner sc, String prompt) {
+        System.out.println(prompt);
+        String s = sc.nextLine().trim();
+
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            System.out.println("Please enter a valid number.");
+            return null;
+        }
+    }
     /**
      * Determines if the application is running in development mode based on system properties,
      * environment variables, or command-line arguments.
