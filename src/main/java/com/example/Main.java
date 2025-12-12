@@ -29,8 +29,8 @@ public class Main {
                             "as system properties (-Dkey=value) or environment variables.");
         }
 
-        try (Connection connection = DriverManager.getConnection(jdbcUrl, dbUser, dbPass)) {
-            Scanner sc = new Scanner(System.in);
+        try (Connection connection = DriverManager.getConnection(jdbcUrl, dbUser, dbPass);
+            Scanner sc = new Scanner(System.in)){
             login(sc, connection);
             menu(sc, connection);
         } catch (SQLException e) {
