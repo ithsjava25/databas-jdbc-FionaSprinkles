@@ -1,14 +1,10 @@
 package com.example;
 
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.util.ISO8601Utils;
-
-import javax.management.Query;
 import java.sql.*;
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
-
 
     public static void main(String[] args) {
         if (isDevMode(args)) {
@@ -19,23 +15,28 @@ public class Main {
 
     public void run() {
         // Resolve DB settings with precedence: System properties -> Environment variables
-        String jdbcUrl = resolveConfig("APP_JDBC_URL", "APP_JDBC_URL");
+        String dbUrl = resolveConfig("APP_JDBC_URL", "APP_JDBC_URL");
         String dbUser = resolveConfig("APP_DB_USER", "APP_DB_USER");
         String dbPass = resolveConfig("APP_DB_PASS", "APP_DB_PASS");
 
-        if (jdbcUrl == null || dbUser == null || dbPass == null) {
+        if (dbUrl == null || dbUser == null || dbPass == null) {
             throw new IllegalStateException(
                     "Missing DB configuration. Provide APP_JDBC_URL, APP_DB_USER, APP_DB_PASS " +
                             "as system properties (-Dkey=value) or environment variables.");
         }
 
-        try (Connection connection = DriverManager.getConnection(jdbcUrl, dbUser, dbPass);
-            Scanner sc = new Scanner(System.in)){
+        JdbcDataSource dS = new JdbcDataSource(dbUrl, dbUser, dbPass);
+
+            Scanner sc = new Scanner(System.in);
+
+        try (Connection connection = dS.getConnection()) {
             login(sc, connection);
             menu(sc, connection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+
         //Todo: Starting point for your code
 
 
