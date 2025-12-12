@@ -180,7 +180,10 @@ public class Main {
         String ssn = sc.nextLine();
 
         //Generate username
-        String name = firstName.substring(0, 3) + lastName.substring(0, 3);
+
+        String name1 = firstName.length() < 3 ? firstName : firstName.substring(0, 3);
+        String name2 = lastName.length() < 3 ? lastName : lastName.substring(0, 3);
+        String name = name1 + name2;
 
         String query = "INSERT INTO account (password, first_name, last_name, ssn, name) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)){
