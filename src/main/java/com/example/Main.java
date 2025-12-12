@@ -59,9 +59,9 @@ public class Main {
                 choice = Integer.parseInt(sc.nextLine());
 
             } catch (Exception e) {
-                    System.out.println("Invalid choice.");
-                    continue;
-                }
+                System.out.println("Invalid choice.");
+                continue;
+            }
 
             switch (choice) {
                 case 1: // List moon missions
@@ -110,8 +110,8 @@ public class Main {
                     System.out.println("Exit");
                     return;
 
-                    default:
-                        System.out.println("Invalid choice.");
+                default:
+                    System.out.println("Invalid choice.");
             }
 
         }
@@ -120,11 +120,12 @@ public class Main {
     // Menu Option 1 : List Moon Missions
     private void moonMission(Connection connection) throws SQLException {
         String query = "SELECT spacecraft FROM moon_mission";
-        PreparedStatement statement = connection.prepareStatement(query);
-        ResultSet moonMission = statement.executeQuery();
-        while (moonMission.next()){
-            String spacecraft = moonMission.getString("spacecraft");
-            System.out.println(spacecraft);
+        try (PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet moonMission = statement.executeQuery()) {
+            while (moonMission.next()) {
+                String spacecraft = moonMission.getString("spacecraft");
+                System.out.println(spacecraft);
+            }
         }
     }
 
@@ -134,22 +135,25 @@ public class Main {
         int missionID = Integer.parseInt(sc.nextLine());
 
         String query = "select * from moon_mission WHERE mission_id = ?";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1, missionID);
-        ResultSet missionIdResult = statement.executeQuery();
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, missionID);
 
-        if (missionIdResult.next()) {
-            String mission = missionIdResult.getString("mission_type");
-            String spacecraft = missionIdResult.getString("spacecraft");
-            String launchDate = missionIdResult.getString("launch_date");
-            String outcome = missionIdResult.getString("outcome");
+            try (ResultSet missionIdResult = statement.executeQuery()) {
 
-            System.out.println("Mission type: " + mission);
-            System.out.println("Launch date: " + launchDate);
-            System.out.println("Outcome: " + outcome);
-            System.out.println("Spacecraft: " + spacecraft);
-        } else  {
-            System.out.println("No mission found");
+                if (missionIdResult.next()) {
+                    String mission = missionIdResult.getString("mission_type");
+                    String spacecraft = missionIdResult.getString("spacecraft");
+                    String launchDate = missionIdResult.getString("launch_date");
+                    String outcome = missionIdResult.getString("outcome");
+
+                    System.out.println("Mission type: " + mission);
+                    System.out.println("Launch date: " + launchDate);
+                    System.out.println("Outcome: " + outcome);
+                    System.out.println("Spacecraft: " + spacecraft);
+                } else {
+                    System.out.println("No mission found");
+                }
+            }
         }
     }
 
@@ -161,13 +165,16 @@ public class Main {
         int year = Integer.parseInt(sc.nextLine());
 
         String query = "SELECT count(*) FROM moon_mission WHERE YEAR(launch_date) = ?";
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)){
         preparedStatement.setInt(1, year);
 
-        ResultSet countMissions = preparedStatement.executeQuery();
+        try (ResultSet countMissions = preparedStatement.executeQuery()){
         countMissions.next();
         int totalYears = countMissions.getInt(1);
-        System.out.println("In " + year + " there were " +  totalYears + " mission/missions.");
+        System.out.println("In " + year + " there were " + totalYears + " mission/missions.");
+    }
+    }
+
     }
 
     // Menu Option 4 : Create an account
@@ -187,7 +194,7 @@ public class Main {
         String name = firstName.substring(0, 3) + lastName.substring(0, 3);
 
         String query = "INSERT INTO account (password, first_name, last_name, ssn, name) VALUES (?, ?, ?, ?, ?)";
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)){
         preparedStatement.setString(1, password);
         preparedStatement.setString(2, firstName);
         preparedStatement.setString(3, lastName);
@@ -195,8 +202,9 @@ public class Main {
         preparedStatement.setString(5, name);
         preparedStatement.executeUpdate();
 
-        System.out.println("Account created successfully");
-        System.out.println("Your username: " + name);
+            System.out.println("Account created successfully");
+            System.out.println("Your username: " + name);
+        }
 
     }
 
@@ -208,13 +216,14 @@ public class Main {
         System.out.println("Please enter your new password:");
         String newPassword = sc.nextLine();
         String query2 = "UPDATE account SET password=? WHERE user_id=?";
-        PreparedStatement update = connection.prepareStatement(query2);
+        try (PreparedStatement update = connection.prepareStatement(query2)){
         update.setString(1, newPassword);
         update.setInt(2, userID);
         update.executeUpdate();
 
-        System.out.println("Your password has been updated");
-        System.out.println("updated");
+            System.out.println("Your password has been updated");
+            System.out.println("updated");
+        }
 
     }
 
@@ -224,11 +233,12 @@ public class Main {
         int userID = Integer.parseInt(sc.nextLine());
 
         String query = "DELETE FROM account WHERE user_id = ?";
-        PreparedStatement delete = connection.prepareStatement(query);
-        delete.setInt(1, userID);
-        delete.executeUpdate();
+        try (PreparedStatement delete = connection.prepareStatement(query)) {
+            delete.setInt(1, userID);
+            delete.executeUpdate();
 
-        System.out.println("Account deleted successfully");
+            System.out.println("Account deleted successfully");
+        }
     }
 
     //LogIn with username and password
