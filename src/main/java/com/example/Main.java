@@ -251,16 +251,18 @@ public class Main {
                 statement.setString(1, username);
                 statement.setString(2, password);
 
-                ResultSet rs = statement.executeQuery();
+                try (ResultSet rs = statement.executeQuery()){
 
                 if (rs.next()) {
                     System.out.println("You logged in as " + username);
                     break;
-                } else  {
+                } else {
                     System.out.println("Invalid username or password");
                 }
+                }
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                    System.out.println("Database error: " + e.getMessage());
+
             }
 
 
