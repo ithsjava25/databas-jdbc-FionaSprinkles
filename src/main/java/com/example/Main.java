@@ -2,6 +2,7 @@ package com.example;
 
 import java.sql.*;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -26,15 +27,16 @@ public class Main {
         }
 
         JdbcDataSource dS = new JdbcDataSource(dbUrl, dbUser, dbPass);
+        MoonMissionRepository moonMissionRepository = new MoonMissionRepositoryImpl(dS);
 
             Scanner sc = new Scanner(System.in);
 
-        try (Connection connection = dS.getConnection()) {
-            login(sc, connection);
-            menu(sc, connection);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+//        try (Connection connection = dS.getConnection()) {
+//            login(sc, connection);
+            menu(sc, moonMissionRepository);
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
 
 
         //Todo: Starting point for your code
@@ -43,7 +45,7 @@ public class Main {
     }
 
     // Main Menu
-    private void menu(Scanner sc, Connection connection) {
+    private void menu(Scanner sc, MoonMissionRepository moonMissionRepository) {
         while (true) {
 
             System.out.println("1) List moon missions");
@@ -64,30 +66,33 @@ public class Main {
                 continue;
             }
 
-            try {
+
                 switch (choice) {
                     case 1: // List moon missions
-                            moonMission(connection);
+                        List<String> missions = moonMissionRepository.listAllMoonMissions();
+                        for (String m : missions) {
+                            System.out.println(m);
+                        }
 
                         break;
                     case 2: // Get a moon mission by mission_id
-                            missionID(sc, connection);
+//                            missionID(sc, connection);
 
                         break;
                     case 3: // Count missions for a given year
-                            countYears(sc, connection);
+//                            countYears(sc, connection);
 
                         break;
                     case 4: //Create an account
-                            createNewAccount(sc, connection);
+//                            createNewAccount(sc, connection);
 
                         break;
                     case 5: // Update an account password
-                            updatePassword(sc, connection);
+//                            updatePassword(sc, connection);
 
                         break;
                     case 6: // Delete an account
-                            deleteAccount(sc, connection);
+//                            deleteAccount(sc, connection);
 
                         break;
                     case 0:
@@ -97,25 +102,22 @@ public class Main {
                     default:
                         System.out.println("Invalid choice.");
                         }
-                } catch(SQLException e)
-                {
-                    System.out.println("Database error: " + e.getMessage());
-                }
+
             }
 
         }
 
     // Menu Option 1 : List Moon Missions
-    private void moonMission(Connection connection) throws SQLException {
-        String query = "SELECT spacecraft FROM moon_mission";
-        try (PreparedStatement statement = connection.prepareStatement(query);
-             ResultSet moonMission = statement.executeQuery()) {
-            while (moonMission.next()) {
-                String spacecraft = moonMission.getString("spacecraft");
-                System.out.println(spacecraft);
-            }
-        }
-    }
+//    private void moonMission(Connection connection) throws SQLException {
+//        String query = "SELECT spacecraft FROM moon_mission";
+//        try (PreparedStatement statement = connection.prepareStatement(query);
+//             ResultSet moonMission = statement.executeQuery()) {
+//            while (moonMission.next()) {
+//                String spacecraft = moonMission.getString("spacecraft");
+//                System.out.println(spacecraft);
+//            }
+//        }
+//    }
 
     //Menu Option 2 : Get a moon mission by mission_id
     private static void missionID(Scanner sc, Connection connection) throws SQLException {

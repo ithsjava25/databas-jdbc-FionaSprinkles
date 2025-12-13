@@ -1,5 +1,7 @@
 package com.example;
 
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MoonMissionRepositoryImpl implements MoonMissionRepository {
@@ -12,11 +14,23 @@ public class MoonMissionRepositoryImpl implements MoonMissionRepository {
 
     @Override
     public List<String> listAllMoonMissions() {
+        List<String> list = new ArrayList<>();
+        String query = "select spacecraft from moon_mission";
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery()){
 
-        return List.of();
+            while (resultSet.next()) {
+                list.add(resultSet.getString("spacecraft"));
+            }
+            }
+            catch (SQLException e){
+                throw new RuntimeException(e);
+            }
+            return list;
     }
 
-    @Override
+        @Override
     public String getMoonMissionByID(int moonMissionId) {
         return "";
     }
