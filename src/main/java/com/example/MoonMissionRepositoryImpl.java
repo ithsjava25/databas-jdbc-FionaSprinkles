@@ -66,11 +66,23 @@ public class MoonMissionRepositoryImpl implements MoonMissionRepository {
             }
         }
 
-
-
-
+    //Menu Option 3 : Count missions for a given year
     @Override
     public int countMissionsByYear(int year) {
-        return 0;
+
+        String query = "SELECT count(*) FROM moon_mission WHERE YEAR(launch_date) = ?";
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query)){
+            statement.setInt(1, year);
+
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()){
+                    return rs.getInt(1);
+                }
+                return 0;
+            }
+        } catch (SQLException e){
+            throw new RuntimeException(e);
+    }
     }
 }

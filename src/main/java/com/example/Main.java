@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+import static com.example.UtilsInput.readInt;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -76,7 +78,7 @@ public class Main {
 
                         break;
                     case 2: // Get a moon mission by mission_id
-                        Integer moonMissionId = UtilsInput.readInt(sc, "Mission id");
+                        Integer moonMissionId = readInt(sc, "Mission id");
                         if (moonMissionId == null) {
                             break;
                         }
@@ -90,7 +92,17 @@ public class Main {
 
                         break;
                     case 3: // Count missions for a given year
-//                            countYears(sc, connection);
+                            Integer year = readInt(sc, "What year would you like to see? : \n Write year YYYY");
+                            if (year == null) {
+                                break;
+                            }
+                            int countMissions = moonMissionRepository.countMissionsByYear(year);
+                            if (countMissions == 0) {
+                                System.out.println("Mission not found.");
+                            } else {
+
+                                System.out.println("In " + year + " there were " + countMissions + " mission/missions.");
+                            }
 
                         break;
                     case 4: //Create an account
@@ -118,25 +130,7 @@ public class Main {
         }
 
 
-//    //Menu Option 3 : Count missions for a given year
-//    private static void countYears(Scanner sc, Connection connection) throws SQLException {
-//        Integer year = readInt(sc, "What year would you like to see? : \n Write year YYYY");
-//        if (year == null) {
-//            return;
-//        }
-//
-//        String query = "SELECT count(*) FROM moon_mission WHERE YEAR(launch_date) = ?";
-//        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-//            preparedStatement.setInt(1, year);
-//
-//            try (ResultSet countMissions = preparedStatement.executeQuery()) {
-//                countMissions.next();
-//                int totalYears = countMissions.getInt(1);
-//                System.out.println("In " + year + " there were " + totalYears + " mission/missions.");
-//            }
-//        }
-//
-//    }
+
 
 //    // Menu Option 4 : Create an account
 //    private static void createNewAccount(Scanner sc, Connection connection) throws SQLException {
