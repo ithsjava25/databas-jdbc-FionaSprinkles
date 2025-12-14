@@ -1,5 +1,9 @@
 package com.example;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 public class AccountRepositoryImpl implements AccountRepository {
 
     private final JdbcDataSource dataSource;
@@ -14,9 +18,38 @@ public class AccountRepositoryImpl implements AccountRepository {
         return false;
     }
 
+    // Menu Option 4 : Create an account
     @Override
-    public void createAccount(String password, String firstName, String lastName, String ssn) {
+    public String createAccount(String password, String firstName, String lastName, String ssn) {
 
+
+        // Generate username
+
+        String name1 = firstName.length() < 3 ? firstName : firstName.substring(0, 3);
+        String name2 = lastName.length() < 3 ? lastName : lastName.substring(0, 3);
+        String name = name1 + name2;
+
+        // Make new account
+
+        String query = "INSERT INTO account (password, first_name, last_name, ssn, name) VALUES (?, ?, ?, ?, ?)";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)){
+
+        statement.setString(1, password);
+        statement.setString(2, firstName);
+        statement.setString(3, lastName);
+        statement.setString(4, ssn);
+        statement.setString(5, name);
+        statement.executeUpdate();
+
+        return name;
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+
+
+    }
     }
 
     @Override

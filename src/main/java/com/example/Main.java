@@ -30,12 +30,13 @@ public class Main {
 
         JdbcDataSource dS = new JdbcDataSource(dbUrl, dbUser, dbPass);
         MoonMissionRepository moonMissionRepository = new MoonMissionRepositoryImpl(dS);
+        AccountRepository accountRepository = new AccountRepositoryImpl(dS);
 
             Scanner sc = new Scanner(System.in);
 
 //        try (Connection connection = dS.getConnection()) {
 //            login(sc, connection);
-            menu(sc, moonMissionRepository);
+            menu(sc, moonMissionRepository, accountRepository);
 //        } catch (SQLException e) {
 //            throw new RuntimeException(e);
 //        }
@@ -47,7 +48,7 @@ public class Main {
     }
 
     // Main Menu
-    private void menu(Scanner sc, MoonMissionRepository moonMissionRepository) {
+    private void menu(Scanner sc, MoonMissionRepository moonMissionRepository, AccountRepository accountRepository) {
         while (true) {
 
             System.out.println("1) List moon missions");
@@ -106,7 +107,25 @@ public class Main {
 
                         break;
                     case 4: //Create an account
-//                            createNewAccount(sc, connection);
+
+
+
+                        System.out.println("Create new account");
+
+                        System.out.println("Please enter new password:");
+                        String password = sc.nextLine();
+                        System.out.println("Please enter your first name:");
+                        String firstName = sc.nextLine();
+                        System.out.println("Please enter your last name:");
+                        String lastName = sc.nextLine();
+                        System.out.println("Please enter your ssn:");
+                        String ssn = sc.nextLine();
+
+                        String username = accountRepository.createAccount(password,firstName,lastName,ssn);
+
+
+                        System.out.println("Account created successfully");
+                        System.out.println("Your username: " + username);
 
                         break;
                     case 5: // Update an account password
@@ -130,41 +149,6 @@ public class Main {
         }
 
 
-
-
-//    // Menu Option 4 : Create an account
-//    private static void createNewAccount(Scanner sc, Connection connection) throws SQLException {
-//        System.out.println("Create new account");
-//
-//        System.out.println("Please enter new password:");
-//        String password = sc.nextLine();
-//        System.out.println("Please enter your first name:");
-//        String firstName = sc.nextLine();
-//        System.out.println("Please enter your last name:");
-//        String lastName = sc.nextLine();
-//        System.out.println("Please enter your ssn:");
-//        String ssn = sc.nextLine();
-//
-//        //Generate username
-//
-//        String name1 = firstName.length() < 3 ? firstName : firstName.substring(0, 3);
-//        String name2 = lastName.length() < 3 ? lastName : lastName.substring(0, 3);
-//        String name = name1 + name2;
-//
-//        String query = "INSERT INTO account (password, first_name, last_name, ssn, name) VALUES (?, ?, ?, ?, ?)";
-//        try (PreparedStatement preparedStatement = connection.prepareStatement(query)){
-//        preparedStatement.setString(1, password);
-//        preparedStatement.setString(2, firstName);
-//        preparedStatement.setString(3, lastName);
-//        preparedStatement.setString(4, ssn);
-//        preparedStatement.setString(5, name);
-//        preparedStatement.executeUpdate();
-//
-//            System.out.println("Account created successfully");
-//            System.out.println("Your username: " + name);
-//        }
-//
-//    }
 //
 //    // Menu Option 5 : Update an account password
 //    private static void updatePassword(Scanner sc, Connection connection) throws SQLException {
