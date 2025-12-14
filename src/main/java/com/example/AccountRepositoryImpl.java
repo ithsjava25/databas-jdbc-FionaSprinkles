@@ -54,8 +54,24 @@ public class AccountRepositoryImpl implements AccountRepository {
 
     @Override
     public boolean updatePassword(int userID, String newPassword) {
-        return false;
+
+        String query = "UPDATE account SET password=? WHERE user_id=?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement update = connection.prepareStatement(query)) {
+
+            update.setString(1, newPassword);
+            update.setInt(2, userID);
+
+            int updated = update.executeUpdate();
+            return updated > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
+
+
+
 
     @Override
     public boolean deleteAccount(int userID) {

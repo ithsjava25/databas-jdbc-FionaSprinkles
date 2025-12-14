@@ -108,8 +108,6 @@ public class Main {
                         break;
                     case 4: //Create an account
 
-
-
                         System.out.println("Create new account");
 
                         System.out.println("Please enter new password:");
@@ -129,7 +127,19 @@ public class Main {
 
                         break;
                     case 5: // Update an account password
-//                            updatePassword(sc, connection);
+                        Integer userID =  readInt(sc, "Please enter your userID:");
+                        if (userID == null) {
+                            return;
+                        }
+                        System.out.println("Please enter your new password:");
+                        String newPassword = sc.nextLine();
+
+                        boolean updated = accountRepository.updatePassword(userID, newPassword);
+
+                        if (updated) {
+                            System.out.println("Your password has been updated");
+                        } else
+                            System.out.println("No account found with userID: " + userID);
 
                         break;
                     case 6: // Delete an account
