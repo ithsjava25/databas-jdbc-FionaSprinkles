@@ -55,9 +55,9 @@ public class MoonMissionRepositoryImpl implements MoonMissionRepository {
                         String launchdate = missionIdResult.getString("launch_date");
                         String outcome = missionIdResult.getString("outcome");
 
-                        return "Mission type: " + missionType +
-                                "Launch date: " + launchdate +
-                                "Outcome: " + outcome +
+                        return "Mission type: " + missionType + "\n" +
+                                "Launch date: " + launchdate + "\n" +
+                                "Outcome: " + outcome + "\n" +
                                 "Spacecraft: " + spacecraft;
                     }
                 }
