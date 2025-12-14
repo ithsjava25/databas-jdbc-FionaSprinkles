@@ -71,10 +71,20 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
 
-
-
+    // Menu Option 6 : Delete an account
     @Override
     public boolean deleteAccount(int userID) {
-        return false;
+        String query = "DELETE FROM account WHERE user_id = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement delete = connection.prepareStatement(query)) {
+
+            delete.setInt(1, userID);
+            int deleted = delete.executeUpdate();
+            return deleted > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
+
 }

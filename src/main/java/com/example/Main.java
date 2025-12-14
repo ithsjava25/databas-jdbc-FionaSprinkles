@@ -143,7 +143,17 @@ public class Main {
 
                         break;
                     case 6: // Delete an account
-//                            deleteAccount(sc, connection);
+                        userID = readInt(sc, "To delete user, please enter userID:");
+                        if (userID == null) {
+                            return;
+                        }
+
+                        boolean deleted = accountRepository.deleteAccount(userID);
+                        if (deleted) {
+                            System.out.println("Account deleted successfully");
+                        } else {
+                            System.out.println("No account found with userID: " + userID);
+                        }
 
                         break;
                     case 0:
@@ -157,45 +167,6 @@ public class Main {
             }
 
         }
-
-
-//
-//    // Menu Option 5 : Update an account password
-//    private static void updatePassword(Scanner sc, Connection connection) throws SQLException {
-//
-//        Integer userID =  readInt(sc, "Please enter your userID:");
-//        if (userID == null) {
-//            return;
-//        }
-//        System.out.println("Please enter your new password:");
-//        String newPassword = sc.nextLine();
-//        String query2 = "UPDATE account SET password=? WHERE user_id=?";
-//        try (PreparedStatement update = connection.prepareStatement(query2)){
-//        update.setString(1, newPassword);
-//        update.setInt(2, userID);
-//        update.executeUpdate();
-//
-//            System.out.println("Your password has been updated");
-//            System.out.println("updated");
-//        }
-//
-//    }
-//
-//    // Menu Option 6 : Delete an account
-//    private static void deleteAccount(Scanner sc, Connection connection) throws SQLException {
-//        Integer userID = readInt(sc, "To delete user, please enter userID:");
-//        if (userID == null) {
-//            return;
-//        }
-//
-//        String query = "DELETE FROM account WHERE user_id = ?";
-//        try (PreparedStatement delete = connection.prepareStatement(query)) {
-//            delete.setInt(1, userID);
-//            delete.executeUpdate();
-//
-//            System.out.println("Account deleted successfully");
-//        }
-//    }
 
     // LogIn with username and password
     private static void login(Scanner sc , Connection connection) {
