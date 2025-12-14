@@ -47,18 +47,15 @@ public class MoonMissionRepositoryImpl implements MoonMissionRepository {
                     if (!missionIdResult.next()) {
                         return null;
                     }
+                    String missionType = missionIdResult.getString("mission_type");
+                    String spacecraft = missionIdResult.getString("spacecraft");
+                    String launchdate = missionIdResult.getString("launch_date");
+                    String outcome = missionIdResult.getString("outcome");
 
-                     {
-                        String missionType = missionIdResult.getString("mission_type");
-                        String spacecraft = missionIdResult.getString("spacecraft");
-                        String launchdate = missionIdResult.getString("launch_date");
-                        String outcome = missionIdResult.getString("outcome");
-
-                        return "Mission type: " + missionType + "\n" +
-                                "Launch date: " + launchdate + "\n" +
-                                "Outcome: " + outcome + "\n" +
-                                "Spacecraft: " + spacecraft;
-                    }
+                    return "Mission type: " + missionType + "\n" +
+                            "Launch date: " + launchdate + "\n" +
+                            "Outcome: " + outcome + "\n" +
+                            "Spacecraft: " + spacecraft;
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
