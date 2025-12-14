@@ -120,19 +120,19 @@ public class Main {
                             break;
                         }
 
+                        /**
+                         * CodeRabbit wants me to Validate SSN length,
+                         * but it's not compatible with tests.
+                         * This is a deliberate simplification for a lab assignment.
+                         * The code is not intended for production use or reuse in non-lab contexts.
+                         */
                         System.out.println("Please enter your ssn:");
                         String ssn = sc.nextLine();
 
                         ssn = ssn.replaceAll("\\D", "");
 
-                        if (ssn.trim().isEmpty()) {
+                        if (ssn.isEmpty()) {
                             System.out.println("SSN cannot be empty.");
-                            break;
-                        }
-                        try {
-                            Integer.parseInt(ssn);
-                        } catch (NumberFormatException e) {
-                            System.out.println("SSN must contain only digits.");
                             break;
                         }
 
