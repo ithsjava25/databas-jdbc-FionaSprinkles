@@ -1,13 +1,14 @@
 package com.example;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
+
+import static com.example.UtilsInput.readInt;
 
 public class Main {
 
-    static void main(String[] args) {
+    public static void main(String[] args) {
         if (isDevMode(args)) {
             DevDatabaseInitializer.start();
         }
@@ -16,21 +17,203 @@ public class Main {
 
     public void run() {
         // Resolve DB settings with precedence: System properties -> Environment variables
-        String jdbcUrl = resolveConfig("APP_JDBC_URL", "APP_JDBC_URL");
+        String dbUrl = resolveConfig("APP_JDBC_URL", "APP_JDBC_URL");
         String dbUser = resolveConfig("APP_DB_USER", "APP_DB_USER");
         String dbPass = resolveConfig("APP_DB_PASS", "APP_DB_PASS");
 
-        if (jdbcUrl == null || dbUser == null || dbPass == null) {
+        if (dbUrl == null || dbUser == null || dbPass == null) {
             throw new IllegalStateException(
                     "Missing DB configuration. Provide APP_JDBC_URL, APP_DB_USER, APP_DB_PASS " +
                             "as system properties (-Dkey=value) or environment variables.");
         }
 
-        try (Connection connection = DriverManager.getConnection(jdbcUrl, dbUser, dbPass)) {
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        JdbcDataSource dS = new JdbcDataSource(dbUrl, dbUser, dbPass);
+        MoonMissionRepository moonMissionRepository = new MoonMissionRepositoryImpl(dS);
+        AccountRepository accountRepository = new AccountRepositoryImpl(dS);
+
+            try (Scanner sc = new Scanner(System.in)) {
+                login(sc, accountRepository);
+                menu(sc, moonMissionRepository, accountRepository);
+            }
+
+
         //Todo: Starting point for your code
+
+
+    }
+
+    // Main Menu
+    private void menu(Scanner sc, MoonMissionRepository moonMissionRepository, AccountRepository accountRepository) {
+        while (true) {
+
+            System.out.println("1) List moon missions");
+            System.out.println("2) Get a moon mission by mission_id");
+            System.out.println("3) Count missions for a given year");
+            System.out.println("4) Create an account");
+            System.out.println("5) Update an account password");
+            System.out.println("6) Delete an account");
+            System.out.println("0) Exit");
+
+            Integer choice = readInt(sc, "Enter your choice:");
+            if (choice == null) {
+                continue;
+            }
+
+
+                switch (choice) {
+                    case 1: // List moon missions
+                        List<String> missions = moonMissionRepository.listAllMoonMissions();
+                        for (String m : missions) {
+                            System.out.println(m);
+                        }
+
+                        break;
+                    case 2: // Get a moon mission by mission_id
+                        Integer moonMissionId = readInt(sc, "Mission id");
+                        if (moonMissionId == null) {
+                            break;
+                        }
+
+                        String getMission = moonMissionRepository.getMoonMissionByID(moonMissionId);
+                        if (getMission == null) {
+                            System.out.println("Mission not found.");
+                        } else {
+                            System.out.println(getMission);
+                        }
+
+                        break;
+                    case 3: // Count missions for a given year
+                            Integer year = readInt(sc, "What year would you like to see? : \n Write year YYYY");
+                            if (year == null) {
+                                break;
+                            }
+                            int countMissions = moonMissionRepository.countMissionsByYear(year);
+                            if (countMissions == 0) {
+                                System.out.println("Mission not found.");
+                            } else {
+
+                                System.out.println("In " + year + " there were " + countMissions + " mission/missions.");
+                            }
+
+                        break;
+                    case 4: //Create an account
+
+                        System.out.println("Create new account");
+
+                        System.out.println("Please enter new password:");
+                        String password = sc.nextLine();
+                        if (password.trim().isEmpty()) {
+                            System.out.println("Password cannot be empty.");
+                            break;
+                        }
+                        System.out.println("Please enter your first name:");
+                        String firstName = sc.nextLine();
+                        if (firstName.trim().isEmpty()) {
+                            System.out.println("First name cannot be empty.");
+                            break;
+                        }
+
+                        System.out.println("Please enter your last name:");
+                        String lastName = sc.nextLine();
+                        if (lastName.trim().isEmpty()) {
+                            System.out.println("Last name cannot be empty.");
+                            break;
+                        }
+
+                        /**
+                         * CodeRabbit wants me to Validate SSN length,
+                         * but it's not compatible with tests.
+                         * This is a deliberate simplification for a lab assignment.
+                         * The code is not intended for production use or reuse in non-lab contexts.
+                         */
+                        System.out.println("Please enter your ssn:");
+                        String ssn = sc.nextLine();
+
+                        ssn = ssn.replaceAll("\\D", "");
+
+                        if (ssn.isEmpty()) {
+                            System.out.println("SSN cannot be empty.");
+                            break;
+                        }
+
+                        String username = accountRepository.createAccount(password,firstName,lastName,ssn);
+
+
+                        System.out.println("Account created successfully");
+                        System.out.println("Your username: " + username);
+
+                        break;
+                    case 5: // Update an account password
+                        Integer userID =  readInt(sc, "Please enter your userID:");
+                        if (userID == null) {
+                            break;
+                        }
+                        System.out.println("Please enter your new password:");
+                        String newPassword = sc.nextLine();
+
+                        if (newPassword.trim().isEmpty()) {
+                            System.out.println("Password cannot be empty.");
+                            break;
+                        }
+
+                        boolean updated = accountRepository.updatePassword(userID, newPassword);
+
+                        if (updated) {
+                            System.out.println("Your password has been updated");
+                        } else
+                            System.out.println("No account found with userID: " + userID);
+
+                        break;
+                    case 6: // Delete an account
+                        userID = readInt(sc, "To delete user, please enter userID:");
+                        if (userID == null) {
+                            break;
+                        }
+
+                        boolean deleted = accountRepository.deleteAccount(userID);
+                        if (deleted) {
+                            System.out.println("Account deleted successfully");
+                        } else {
+                            System.out.println("No account found with userID: " + userID);
+                        }
+
+                        break;
+                    case 0:
+                        System.out.println("Exit");
+                        return;
+
+                    default:
+                        System.out.println("Invalid choice.");
+                        }
+
+            }
+
+        }
+
+    // LogIn with username and password
+    private static void login(Scanner sc , AccountRepository accountRepository) {
+        while (true) {
+            System.out.println("Enter username:");
+            String username = sc.nextLine();
+
+            if ("exit".equalsIgnoreCase(username.trim())) {
+                System.out.println("Exiting application.");
+                System.exit(0);
+            }
+
+            System.out.println("Enter password:");
+            String password = sc.nextLine();
+
+            boolean login = accountRepository.login(username, password);
+
+            if (login) {
+                System.out.println("You logged in as " + username);
+                break;
+            } else {
+                System.out.println("Invalid username or password");
+            }
+        }
+
     }
 
     /**
