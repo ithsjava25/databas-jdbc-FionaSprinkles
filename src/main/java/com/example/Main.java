@@ -1,6 +1,5 @@
 package com.example;
 
-import java.sql.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -103,6 +102,10 @@ public class Main {
 
                         System.out.println("Please enter new password:");
                         String password = sc.nextLine();
+                        if (password.trim().isEmpty()) {
+                            System.out.println("Password cannot be empty.");
+                            break;
+                        }
                         System.out.println("Please enter your first name:");
                         String firstName = sc.nextLine();
                         System.out.println("Please enter your last name:");
@@ -124,6 +127,11 @@ public class Main {
                         }
                         System.out.println("Please enter your new password:");
                         String newPassword = sc.nextLine();
+
+                        if (newPassword.trim().isEmpty()) {
+                            System.out.println("Password cannot be empty.");
+                            break;
+                        }
 
                         boolean updated = accountRepository.updatePassword(userID, newPassword);
 
