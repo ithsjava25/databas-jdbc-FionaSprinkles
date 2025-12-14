@@ -122,8 +122,17 @@ public class Main {
 
                         System.out.println("Please enter your ssn:");
                         String ssn = sc.nextLine();
+
+                        ssn = ssn.replaceAll("\\D", "");
+
                         if (ssn.trim().isEmpty()) {
                             System.out.println("SSN cannot be empty.");
+                            break;
+                        }
+                        try {
+                            Integer.parseInt(ssn);
+                        } catch (NumberFormatException e) {
+                            System.out.println("SSN must contain only digits.");
                             break;
                         }
 
