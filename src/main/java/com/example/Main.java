@@ -195,6 +195,12 @@ public class Main {
         while (true) {
             System.out.println("Enter username:");
             String username = sc.nextLine();
+
+            if ("exit".equalsIgnoreCase(username.trim())) {
+                System.out.println("Exiting application.");
+                System.exit(0);
+            }
+
             System.out.println("Enter password:");
             String password = sc.nextLine();
 
