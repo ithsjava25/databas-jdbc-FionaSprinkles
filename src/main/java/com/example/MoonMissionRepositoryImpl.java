@@ -4,6 +4,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.UtilsInput.readInt;
+
 public class MoonMissionRepositoryImpl implements MoonMissionRepository {
 
     private final JdbcDataSource dataSource;
@@ -12,6 +14,8 @@ public class MoonMissionRepositoryImpl implements MoonMissionRepository {
         this.dataSource = dataSource;
     }
 
+
+    // Menu Option 1 : List Moon Missions
     @Override
     public List<String> listAllMoonMissions() {
         List<String> list = new ArrayList<>();
@@ -30,10 +34,40 @@ public class MoonMissionRepositoryImpl implements MoonMissionRepository {
             return list;
     }
 
-        @Override
+    //Menu Option 2 : Get a moon mission by mission_id
+    @Override
     public String getMoonMissionByID(int moonMissionId) {
-        return "";
-    }
+            String query = "select * from moon_mission WHERE mission_id = ?";
+
+            try (Connection connection = dataSource.getConnection();
+                 PreparedStatement statement = connection.prepareStatement(query)) {
+
+                statement.setInt(1, moonMissionId);
+
+                try (ResultSet missionIdResult = statement.executeQuery()) {
+                    if (!missionIdResult.next()) {
+                        return null;
+                    }
+
+                     {
+                        String missionType = missionIdResult.getString("mission_type");
+                        String spacecraft = missionIdResult.getString("spacecraft");
+                        String launchdate = missionIdResult.getString("launch_date");
+                        String outcome = missionIdResult.getString("outcome");
+
+                        return "Mission type: " + missionType +
+                                "Launch date: " + launchdate +
+                                "Outcome: " + outcome +
+                                "Spacecraft: " + spacecraft;
+                    }
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+
+
 
     @Override
     public int countMissionsByYear(int year) {
