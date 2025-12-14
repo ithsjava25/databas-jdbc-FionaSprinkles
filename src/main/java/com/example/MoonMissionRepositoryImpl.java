@@ -4,7 +4,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.UtilsInput.readInt;
 
 public class MoonMissionRepositoryImpl implements MoonMissionRepository {
 

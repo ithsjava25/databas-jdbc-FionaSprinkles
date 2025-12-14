@@ -55,13 +55,8 @@ public class Main {
             System.out.println("6) Delete an account");
             System.out.println("0) Exit");
 
-            int choice;
-
-            try {
-                choice = Integer.parseInt(sc.nextLine());
-
-            } catch (Exception e) {
-                System.out.println("Invalid choice.");
+            Integer choice = readInt(sc, "Enter your choice:");
+            if (choice == null) {
                 continue;
             }
 
@@ -174,7 +169,7 @@ public class Main {
 
             boolean login = accountRepository.login(username, password);
 
-            if (login == true) {
+            if (login) {
                 System.out.println("You logged in as " + username);
                 break;
             } else {
