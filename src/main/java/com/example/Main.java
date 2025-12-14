@@ -32,9 +32,10 @@ public class Main {
         MoonMissionRepository moonMissionRepository = new MoonMissionRepositoryImpl(dS);
         AccountRepository accountRepository = new AccountRepositoryImpl(dS);
 
-            Scanner sc = new Scanner(System.in);
-            login(sc, accountRepository);
-            menu(sc, moonMissionRepository, accountRepository);
+            try (Scanner sc = new Scanner(System.in)) {
+                login(sc, accountRepository);
+                menu(sc, moonMissionRepository, accountRepository);
+            }
 
 
         //Todo: Starting point for your code
