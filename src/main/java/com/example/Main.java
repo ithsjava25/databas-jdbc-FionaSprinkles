@@ -125,7 +125,7 @@ public class Main {
                     case 5: // Update an account password
                         Integer userID =  readInt(sc, "Please enter your userID:");
                         if (userID == null) {
-                            return;
+                            break;
                         }
                         System.out.println("Please enter your new password:");
                         String newPassword = sc.nextLine();
@@ -141,7 +141,7 @@ public class Main {
                     case 6: // Delete an account
                         userID = readInt(sc, "To delete user, please enter userID:");
                         if (userID == null) {
-                            return;
+                            break;
                         }
 
                         boolean deleted = accountRepository.deleteAccount(userID);
