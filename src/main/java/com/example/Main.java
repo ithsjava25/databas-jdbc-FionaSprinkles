@@ -33,13 +33,8 @@ public class Main {
         AccountRepository accountRepository = new AccountRepositoryImpl(dS);
 
             Scanner sc = new Scanner(System.in);
-
-//        try (Connection connection = dS.getConnection()) {
-//            login(sc, connection);
+            login(sc, accountRepository);
             menu(sc, moonMissionRepository, accountRepository);
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
 
 
         //Todo: Starting point for your code
@@ -169,35 +164,23 @@ public class Main {
         }
 
     // LogIn with username and password
-    private static void login(Scanner sc , Connection connection) {
+    private static void login(Scanner sc , AccountRepository accountRepository) {
         while (true) {
             System.out.println("Enter username:");
             String username = sc.nextLine();
             System.out.println("Enter password:");
             String password = sc.nextLine();
 
+            boolean login = accountRepository.login(username, password);
 
-            String query = "SELECT user_id FROM account WHERE name = ? AND password = ?";
-            try (PreparedStatement statement = connection.prepareStatement(query)){
-                statement.setString(1, username);
-                statement.setString(2, password);
-
-                try (ResultSet rs = statement.executeQuery()){
-
-                if (rs.next()) {
-                    System.out.println("You logged in as " + username);
-                    break;
-                } else {
-                    System.out.println("Invalid username or password");
-                }
-                }
-            } catch (SQLException e) {
-                    System.out.println("Database error: " + e.getMessage());
-
+            if (login == true) {
+                System.out.println("You logged in as " + username);
+                break;
+            } else {
+                System.out.println("Invalid username or password");
             }
-
-
         }
+
     }
 
     /**

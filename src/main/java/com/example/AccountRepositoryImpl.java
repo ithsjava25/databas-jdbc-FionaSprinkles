@@ -2,6 +2,7 @@ package com.example;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class AccountRepositoryImpl implements AccountRepository {
@@ -15,8 +16,26 @@ public class AccountRepositoryImpl implements AccountRepository {
 
     @Override
     public boolean login(String username, String password) {
-        return false;
-    }
+        String query = "SELECT user_id FROM account WHERE name = ? AND password = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setString(1, username);
+            statement.setString(2, password);
+
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    return true;
+                } else return false;
+
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+
+            }
+        }
+
 
     // Menu Option 4 : Create an account
     @Override
