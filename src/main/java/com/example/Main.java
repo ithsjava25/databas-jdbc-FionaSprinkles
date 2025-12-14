@@ -108,10 +108,24 @@ public class Main {
                         }
                         System.out.println("Please enter your first name:");
                         String firstName = sc.nextLine();
+                        if (firstName.trim().isEmpty()) {
+                            System.out.println("First name cannot be empty.");
+                            break;
+                        }
+
                         System.out.println("Please enter your last name:");
                         String lastName = sc.nextLine();
+                        if (lastName.trim().isEmpty()) {
+                            System.out.println("Last name cannot be empty.");
+                            break;
+                        }
+
                         System.out.println("Please enter your ssn:");
                         String ssn = sc.nextLine();
+                        if (ssn.trim().isEmpty()) {
+                            System.out.println("SSN cannot be empty.");
+                            break;
+                        }
 
                         String username = accountRepository.createAccount(password,firstName,lastName,ssn);
 
