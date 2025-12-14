@@ -14,6 +14,14 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
 
+    /**
+     * LogIn with username and password
+     *
+     * NOTE:
+     * This implementation uses plaintext passwords.
+     * This is a deliberate simplification for a lab assignment.
+     * The code is not intended for production use or reuse in non-lab contexts.
+     */
     @Override
     public boolean login(String username, String password) {
         String query = "SELECT user_id FROM account WHERE name = ? AND password = ?";
@@ -35,7 +43,6 @@ public class AccountRepositoryImpl implements AccountRepository {
 
             }
         }
-
 
     // Menu Option 4 : Create an account
     @Override
@@ -88,7 +95,6 @@ public class AccountRepositoryImpl implements AccountRepository {
             throw new RuntimeException(e);
         }
     }
-
 
     // Menu Option 6 : Delete an account
     @Override
